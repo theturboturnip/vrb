@@ -72,7 +72,7 @@ struct FileReaderAndroid::State {
       return;
     }
 
-    const int bufferSize = 1024;
+    const int bufferSize = 1024 * 512;
     char buffer[bufferSize];
     int read = 0;
     while ((read = AAsset_read(asset, buffer, bufferSize)) > 0) {
