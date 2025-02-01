@@ -74,9 +74,9 @@ GeometryDrawable::Draw(const Camera& aCamera, const Matrix& aModelTransform) {
     }
     const int32_t maxLength = m.renderBuffer->IndexCount();
     if (m.rangeLength == 0) {
-      VRB_GL_CHECK(glDrawElements(GL_TRIANGLES, maxLength, GL_UNSIGNED_SHORT, 0));
+      VRB_GL_CHECK(glDrawElements(GL_TRIANGLES, maxLength, GL_UNSIGNED_INT, 0));
     } else if ((m.rangeStart + m.rangeLength) <= maxLength) {
-      VRB_GL_CHECK(glDrawElements(GL_TRIANGLES, m.rangeLength, GL_UNSIGNED_SHORT, (void*)(m.rangeStart * sizeof(GLushort))));
+      VRB_GL_CHECK(glDrawElements(GL_TRIANGLES, m.rangeLength, GL_UNSIGNED_INT, (void*)(m.rangeStart * sizeof(GLuint))));
     } else {
       VRB_WARN("Invalid geometry range (%u-%u). Max geometry length %d", m.rangeStart, m.rangeLength + m.rangeLength, maxLength);
     }

@@ -20,9 +20,9 @@ class Geometry : public GeometryDrawable, protected ResourceGL {
 public:
   static GeometryPtr Create(CreationContextPtr& aContext);
   struct Face {
-    std::vector<GLushort> vertices;
-    std::vector<GLushort> uvs;
-    std::vector<GLushort> normals;
+    std::vector<GLuint> vertices;
+    std::vector<GLuint> uvs;
+    std::vector<GLuint> normals;
   };
 
   // Geometry interface

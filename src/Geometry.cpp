@@ -28,13 +28,13 @@
 namespace {
 
 void
-CopyIndices(std::vector<GLushort> &aTarget, const std::vector<int> &aSource) {
+CopyIndices(std::vector<GLuint> &aTarget, const std::vector<int> &aSource) {
   aTarget.reserve(aSource.size());
   for (auto value: aSource) {
-    if (value >= std::numeric_limits<GLushort>::max()) {
-      VRB_ERROR("Index is greater than max size of GLushort: %d", value);
+    if (value >= std::numeric_limits<GLuint>::max()) {
+      VRB_ERROR("Index is greater than max size of GLuint: %d", value);
     }
-    aTarget.push_back(static_cast<GLushort>(value));
+    aTarget.push_back(static_cast<GLuint>(value));
   }
 }
 
@@ -86,8 +86,8 @@ Geometry::UpdateBuffers() {
 
   VRB_GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vertexObjectId));
 
-  std::vector<GLushort> indices;
-  GLushort count = 0;
+  std::vector<GLuint> indices;
+  GLuint count = 0;
   GLintptr offset = 0;
 
   for (auto& face: m.faces) {
@@ -100,13 +100,13 @@ Geometry::UpdateBuffers() {
       VRB_ERROR("Face with only %d vertices:%s", (int32_t)face.vertices.size(), message.c_str());
       continue;
     }
-    const auto vertexIndex = (GLushort)(face.vertices[0] - 1);
-    const auto normalIndex = (GLushort)(face.normals[0] - 1);
-    const auto uvIndex = (GLushort)(kHasTextureCoords ? face.uvs[0] - 1 : -1);
-    const Vector& firstVertex = m.vertexArray->GetVertex(vertexIndex);
-    const Vector& firstNormal = m.vertexArray->GetNormal(normalIndex);
-    const Vector& firstUV = m.vertexArray->GetUV(uvIndex);
-    const Color& firstColor = m.vertexArray->GetColor(vertexIndex);
+    const auto vertexIndex = (GLuint)(face.vertices[0] - 1);
+    const auto normalIndex = (GLuint)(face.normals[0] - 1);
+    const auto uvIndex = (GLuint)(kHasTextureCoords ? face.uvs[0] - 1 : -1);
+    const Vector& firstVertex = m.vertexArray->GetVertex((int32_t)vertexIndex);
+    const Vector& firstNormal = m.vertexArray->GetNormal((int32_t)normalIndex);
+    const Vector& firstUV = m.vertexArray->GetUV((int32_t)uvIndex);
+    const Color& firstColor = m.vertexArray->GetColor((int32_t)vertexIndex);
     for (int ix = 1; ix <= face.vertices.size() - 2; ix++) {
       VRB_GL_CHECK(glBufferSubData(GL_ARRAY_BUFFER, offset, kPositionSize, firstVertex.Data()));
       offset += kPositionSize;
@@ -164,7 +164,7 @@ Geometry::UpdateBuffers() {
   }
 
   VRB_GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexObjectId));
-  VRB_GL_CHECK(glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(GLushort) * indices.size(), indices.data()));
+  VRB_GL_CHECK(glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(GLuint) * indices.size(), indices.data()));
 
 
   VRB_GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
@@ -275,8 +275,8 @@ Geometry::InitializeGL() {
 
   VRB_GL_CHECK(glGenBuffers(1, &indexObjectId));
   VRB_GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexObjectId));
-  VRB_GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort) * m.triangleCount * 3, nullptr, GL_STATIC_DRAW));
-  VRB_LOG("Allocate: %d for GL_ELEMENT_ARRAY_BUFFER: %d", (int32_t)sizeof(GLushort) * m.triangleCount * 3, indexObjectId);
+  VRB_GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * m.triangleCount * 3, nullptr, GL_STATIC_DRAW));
+  VRB_LOG("Allocate: %d for GL_ELEMENT_ARRAY_BUFFER: %d", (int32_t)sizeof(GLuint) * m.triangleCount * 3, indexObjectId);
   m.renderBuffer->SetVertexObject(vertexObjectId, m.vertexCount);
   m.renderBuffer->SetIndexObject(indexObjectId, m.triangleCount * 3);
 
