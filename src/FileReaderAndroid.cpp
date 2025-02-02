@@ -72,11 +72,18 @@ struct FileReaderAndroid::State {
       return;
     }
 
+    // Using a large buffer size means fewer calls to AAsset_read for large files,
+    // greatly improving load times.
     const int bufferSize = 1024 * 512;
-    char buffer[bufferSize];
+    // Large buffers can blow out the stack, so allocate on the heap.
+    std::vector<char> buffer{};
+    buffer.reserve(bufferSize);
+    // AAsset_read returns the number of bytes read in an int, so the soft max on
+    // the size of our buffer is the maximum int value.
+    // We know bufferSize is smaller than the maximum int, so this should all work out.
     int read = 0;
-    while ((read = AAsset_read(asset, buffer, bufferSize)) > 0) {
-      aHandler->ProcessRawFileChunk(handle, buffer, read);
+    while ((read = AAsset_read(asset, buffer.data(), bufferSize)) > 0) {
+      aHandler->ProcessRawFileChunk(handle, buffer.data(), read);
     }
     if (read == 0) {
       aHandler->FinishRawFile(handle);
